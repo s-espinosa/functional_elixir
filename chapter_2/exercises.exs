@@ -47,7 +47,7 @@ defmodule MatchstickFactory do
 
   def box(matchsticks, box_size) do
     boxed = div(matchsticks, box_size)
-    remaining = matchsticks - (box_size * boxed)
+    remaining = rem(matchsticks, box_size)
     [boxed, remaining]
   end
 end
@@ -65,9 +65,9 @@ defmodule Factory do
     IO.inspect(output)
   end
 
-  def box(boxed, key, denominator) do
-    new_box = %{key => div(boxed.remaining_matchsticks, denominator)}
-    rem = boxed[:remaining_matchsticks] - (denominator * new_box[key])
+  def box(boxed, box_name, box_size) do
+    new_box = %{box_name => div(boxed.remaining_matchsticks, box_size)}
+    rem = rem(boxed[:remaining_matchsticks], box_size)
     boxed = Map.put(boxed, :remaining_matchsticks, rem)
     Map.merge(boxed, new_box)
   end
@@ -106,3 +106,48 @@ end
 
 RecursiveFactory.boxes(98)
 RecursiveFactory.boxes(39)
+
+defmodule PatternMatching do
+  def boxes(matchsticks) do
+    box(matchsticks, %{})
+  end
+
+  def box(matchsticks, %{big: a, medium: b, small: c}) do
+    already_boxed = %{big: a, medium: b, small: c}
+    remaining = %{remaining_matchsticks: matchsticks}
+    boxed = Map.merge(already_boxed, remaining)
+    IO.inspect(boxed)
+  end
+
+  def box(matchsticks, %{big: a, medium: b}) do
+    box_name = :small
+    box_size = 5
+    already_boxed = %{big: a, medium: b}
+    boxing = %{box_name => div(matchsticks, box_size)}
+    remaining = rem(matchsticks, box_size)
+    boxed = Map.merge(already_boxed, boxing)
+    box(remaining, boxed)
+  end
+
+  def box(matchsticks, %{big: a}) do
+    box_name = :medium
+    box_size = 20
+    already_boxed = %{big: a}
+    boxing = %{box_name => div(matchsticks, box_size)}
+    remaining = rem(matchsticks, box_size)
+    boxed = Map.merge(already_boxed, boxing)
+    box(remaining, boxed)
+  end
+
+  def box(matchsticks, %{}) do
+    box_name = :big
+    box_size = 50
+    boxing = div(matchsticks, box_size)
+    remaining = rem(matchsticks, box_size)
+    boxed = %{box_name => boxing}
+    box(remaining, boxed)
+  end
+end
+
+PatternMatching.boxes(98)
+PatternMatching.boxes(39)
