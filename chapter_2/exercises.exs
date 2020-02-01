@@ -58,9 +58,9 @@ MatchstickFactory.boxes(39)
 defmodule Factory do
   def boxes(matchsticks) do
     output = %{remaining_matchsticks: matchsticks}
-      |> box(:big, 50)
-      |> box(:medium, 20)
-      |> box(:small, 5)
+             |> box(:big, 50)
+             |> box(:medium, 20)
+             |> box(:small, 5)
 
     IO.inspect(output)
   end
@@ -75,3 +75,34 @@ end
 
 Factory.boxes(98)
 Factory.boxes(39)
+
+
+
+defmodule RecursiveFactory do
+  def boxes(
+    remaining_matchsticks,
+    output \\ %{},
+    box_sizes \\ [[:big, 50], [:medium, 20], [:small, 5]],
+    index \\ 0
+  ) do
+    case box_sizes do
+      [] ->
+        IO.inspect(output)
+      _x ->
+        [current_size | remaining_sizes] = box_sizes
+        key = List.first(current_size)
+        value = List.last(current_size)
+
+        new_box = %{key => div(remaining_matchsticks, value)}
+        rem = remaining_matchsticks - (value * new_box[key])
+        boxed = Map.put(output, :remaining_matchsticks, rem)
+        output = Map.merge(boxed, new_box)
+        index = index + 1
+
+        RecursiveFactory.boxes(rem, output, remaining_sizes, index)
+    end
+  end
+end
+
+RecursiveFactory.boxes(98)
+RecursiveFactory.boxes(39)
