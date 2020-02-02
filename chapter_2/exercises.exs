@@ -99,7 +99,7 @@ defmodule RecursiveFactory do
         output = Map.merge(boxed, new_box)
         index = index + 1
 
-        RecursiveFactory.boxes(rem, output, remaining_sizes, index)
+        boxes(rem, output, remaining_sizes, index)
     end
   end
 end
@@ -151,3 +151,33 @@ end
 
 PatternMatching.boxes(98)
 PatternMatching.boxes(39)
+
+
+
+defmodule AfterLee do
+  def boxes(remaining_matchsticks) do
+    sizes = [{:big, 50}, {:medium, 20}, {:small, 5}]
+    output = make_boxes(sizes, remaining_matchsticks, %{})
+
+    IO.inspect(output)
+  end
+
+  defp make_boxes([], remaining_matchsticks, boxes) do
+    Map.put(boxes, :remaining_matchsticks, remaining_matchsticks)
+  end
+
+  defp make_boxes(box_sizes, remaining_matchsticks, boxes) do
+    [{box_name, box_size} | box_sizes] = box_sizes
+
+    rem = rem(remaining_matchsticks, box_size)
+    new_count = div(remaining_matchsticks, box_size)
+    boxes = Map.put(boxes, box_name, new_count)
+
+    make_boxes(box_sizes, rem, boxes)
+  end
+end
+
+AfterLee.boxes(98)
+AfterLee.boxes(39)
+
+
